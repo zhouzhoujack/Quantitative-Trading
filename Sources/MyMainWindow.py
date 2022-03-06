@@ -306,17 +306,17 @@ class MainWindow(QMainWindow):
         settings = QSettings("hxzz", "Quan_trading")
         settings.beginGroup("DefaultParams")
 
-        self.all_params_info = settings.value("all_params_info")
-        if self.all_params_info is None:
+        all_params_info = settings.value("all_params_info")
+        if all_params_info is None:
             return
 
-        ui.keyLineEdit.setText(self.all_params_info['key'])
-        ui.secretLineEdit.setText(self.all_params_info['secret'])
-        ui.volaLineEdit.setText(str(self.all_params_info['volatility']))
-        ui.minAmountLineEdit.setText(str(self.all_params_info['min_amount']))
-        ui.checkBox.setCheckable(self.all_params_info['auto_start_flag'])
-        ui.minTradeQuanLineEdit.setText(str(self.all_params_info['min_trading_limit']))
-        ui.intervalLineEdit.setText(str(self.all_params_info['run_interval']))
+        ui.keyLineEdit.setText(all_params_info['key'])
+        ui.secretLineEdit.setText(all_params_info['secret'])
+        ui.volaLineEdit.setText(str(all_params_info['volatility']))
+        ui.minAmountLineEdit.setText(str(all_params_info['min_amount']))
+        ui.checkBox.setCheckable(all_params_info['auto_start_flag'])
+        ui.minTradeQuanLineEdit.setText(str(all_params_info['min_trading_limit']))
+        ui.intervalLineEdit.setText(str(all_params_info['run_interval']))
 
     def refreshTimerSlot(self):
         # 定时器的槽函数
