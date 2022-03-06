@@ -1,5 +1,6 @@
 import ccxt
 import time
+import sys
 import logging
 from PyQt5.QtWidgets import QMessageBox
 
@@ -13,11 +14,12 @@ def set_logging_helper():
                         level=logging.INFO)
 
     # setting for console
-    format = logging.Formatter('[%(asctime)s](%(levelname)s) %(message)s')
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
-    ch.setFormatter(format)
-    logger.addHandler(ch)
+    # format = logging.Formatter('[%(asctime)s](%(levelname)s) %(message)s')
+    # hander = logging.StreamHandler(sys.stderr)
+    # hander.setLevel(logging.INFO)
+    # hander.setFormatter(format)
+    # logger.addHandler(hander)
+
     return logger
 
 logger = set_logging_helper()       # 记录日志信息
@@ -54,7 +56,9 @@ class mid_class():
             self.USDT_balance = self.account['USDT']['free']
             self.ETH_balance = self.account['ETH']['free']
         except Exception as e:
-            logger.error("get_account() have a error : {}".format(e))
+            msg = "get_account() have a error : {}".format(e)
+            logger.error(msg)
+            print(msg)
             return False
         return True
 
@@ -68,7 +72,9 @@ class mid_class():
             self.low = self.ticker['low']
             self.last = self.ticker['last']
         except Exception as e:
-            logger.error("get_ticker() have a error : {}".format(e))
+            msg = "get_ticker() have a error : {}".format(e)
+            logger.error(meg)
+            print(msg)
             return False
         return True
 
@@ -147,11 +153,14 @@ class avg_position_class():
                 self.do_juncang()
                 self.last_time = time.time()
         if condition == 'price':
-            logging.info("last price: {} last_trade_price: {} usdt_balance: {} eth_balance: {}".format(
+            msg = "last price: {} last_trade_price: {} usdt_balance: {} eth_balance: {}".format(
                 self.jys.last,
                 self.last_trade_price,
                 self.jys.USDT_balance,
-                self.jys.ETH_balance))
+                self.jys.ETH_balance)
+
+            logging.info(msg)
+            print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
 
             if abs((self.jys.last - self.last_trade_price) / self.last_trade_price) >= prama:
                 self.do_juncang()
@@ -176,7 +185,6 @@ def init_setting_of_strategy(params):
     strategy = avg_position_class(test_mid, params['min_amount'], params['min_trading_limit'])
     strategy.make_need_account_info()
     return strategy
-
 
 def main():
     pass
