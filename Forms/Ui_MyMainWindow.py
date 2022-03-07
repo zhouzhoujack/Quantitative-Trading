@@ -156,9 +156,9 @@ class Ui_MainWindow(object):
         self.label_13 = QtWidgets.QLabel(self.formLayoutWidget_4)
         self.label_13.setObjectName("label_13")
         self.formLayout_4.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.label_13)
-        self.lineEdit = QtWidgets.QLineEdit(self.formLayoutWidget_4)
-        self.lineEdit.setObjectName("lineEdit")
-        self.formLayout_4.setWidget(5, QtWidgets.QFormLayout.FieldRole, self.lineEdit)
+        self.lastTradingPriceLineEdit = QtWidgets.QLineEdit(self.formLayoutWidget_4)
+        self.lastTradingPriceLineEdit.setObjectName("lastTradingPriceLineEdit")
+        self.formLayout_4.setWidget(5, QtWidgets.QFormLayout.FieldRole, self.lastTradingPriceLineEdit)
         self.stopPushButton = QtWidgets.QPushButton(self.groupBox)
         self.stopPushButton.setGeometry(QtCore.QRect(290, 610, 111, 31))
         self.stopPushButton.setObjectName("stopPushButton")
@@ -203,3 +203,4 @@ class Ui_MainWindow(object):
         self.label_12.setText(_translate("MainWindow", "last price"))
         self.label_13.setText(_translate("MainWindow", "last trade price"))
         self.stopPushButton.setText(_translate("MainWindow", "停止"))
+# import res_rc

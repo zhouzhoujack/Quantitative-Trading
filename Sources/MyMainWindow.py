@@ -320,27 +320,19 @@ class MainWindow(QMainWindow):
 
     def refreshTimerSlot(self):
         # 定时器的槽函数
-        if(self.strategy.make_need_account_info()):
+        flag, strategy_status_info = self.strategy.make_need_account_info()
+        if(flag):
             self.strategy.if_need_trade('price', self.all_params_info['volatility'])
+            self.updateStrategyStatusInfo(strategy_status_info)
 
-    #
-    #     formatTime = seconds2time(win.duration)
-    #     ui.lcdNumber.display(formatTime)
-    #     win.trayIcon_.setToolTip(formatTime)
-
-    # if leText == '':
-    #     QMessageBox.warning(win, "提示", "请输入云同步间隔时间!")
-    #     return
-    #
-    # if not ((interval > 0.1 and interval < 0.9 ) or (interval > 0 and interval < 10)):
-    #     QMessageBox.warning(win, "提示", "请输入合法数据!")
-    #     return
-
-    # 将页面参数保存到默认设置中，以便下次应用重启使用，这里secret不保存
-    # settings = QSettings("HXZZ", "AutoCloudSync")
-    # settings.beginGroup("DefaultParams")
-    # settings.setValue("interval", interval)
-    # settings.endGroup()
+    def updateStrategyStatusInfo(self, status_info):
+        ui = self.ui
+        ui.usdtLineEdit.setText(str(status_info['usdt']))
+        ui.ethLineEdit.setText(str(status_info['eth'])+'('+str(status_info['eth']*status_info['last'])+')')
+        ui.buyLineEdit.setText(str(status_info['need_buy']))
+        ui.sellLineEdit.setText(str(status_info['need_sell']))
+        ui.lastLineEdit.setText(str(status_info['last']))
+        ui.lastTradingPriceLineEdit.setText(str(status_info['last_trade_price']))
 
     def changeEvent(self, event):
         """

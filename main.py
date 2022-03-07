@@ -1,5 +1,5 @@
-import sys,os
-from PyQt5.QtWidgets import qApp, QApplication
+import sys
+from PyQt5.QtWidgets import QApplication
 from Sources import MyMainWindow
 
 # 测试

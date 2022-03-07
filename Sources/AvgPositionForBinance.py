@@ -121,11 +121,12 @@ class avg_position_class():
         self.Sell_count = 0
         self.Min_Buy_Sell_Amount = min_bs_amount
         self.Min_Trade_Quantity = min_trade_quantity
+        self.strategy_status_info = {}
 
     def make_need_account_info(self):
-
+        self.strategy_status_info = {}
         if(not self.jys.refreash_data()):
-            return False
+            return False, self.strategy_status_info
 
         self.B = self.jys.ETH_balance
         self.money = self.jys.USDT_balance
@@ -135,15 +136,22 @@ class avg_position_class():
         self.half_money = self.total_money / 2
         self.need_buy = (self.half_money - self.B * now_price) / now_price
         self.need_sell = (self.half_money - self.money) / now_price
-        return True
+
+        self.strategy_status_info['eth'] = self.B
+        self.strategy_status_info['usdt'] = self.money
+        self.strategy_status_info['last'] = self.jys.last
+        self.strategy_status_info['need_buy'] = self.need_buy
+        self.strategy_status_info['need_sell'] = self.need_sell
+        self.strategy_status_info['last_trade_price'] = self.last_trade_price
+        return True, self.strategy_status_info
 
     def do_juncang(self):
         # 需要确保最小交易额大于10usdt，不然会报错
-        if self.need_buy > self.Min_Buy_Sell_Amount and self.need_buy*self.jys > self.Min_Trade_Quantity:
+        if self.need_buy > self.Min_Buy_Sell_Amount and self.need_buy*self.jys.last > self.Min_Trade_Quantity:
             self.jys.create_order('market', 'buy', self.jys.low, self.need_buy)
             logging.critical("Buy: {}  price: {}".format(self.need_buy, self.jys.last))
 
-        elif self.need_sell > self.Min_Buy_Sell_Amount and self.need_sell*self.jys > self.Min_Trade_Quantity:
+        elif self.need_sell > self.Min_Buy_Sell_Amount and self.need_sell*self.jys.last > self.Min_Trade_Quantity:
             self.jys.create_order('market', 'sell', self.jys.high, self.need_sell)
             logging.critical("Sell: {}  price: {}".format(self.need_sell, self.jys.last))
 
