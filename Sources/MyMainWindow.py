@@ -227,6 +227,7 @@ class MainWindow(QMainWindow):
 
     def widgetsSetting(self):
         self.ui.startPushButton.clicked.connect(lambda : self.onStartPushButtonClickedEvent())
+        self.ui.stopPushButton.clicked.connect(lambda: self.onStopPushButtonClickedEvent())
         self.ui.testConnectPushButton.clicked.connect(lambda : self.onTestConnectPushButtonClickedEvent())        # 下面将输出重定向到textEdit中
         self.timer_.timeout.connect(lambda: self.refreshTimerSlot())
 
@@ -298,6 +299,28 @@ class MainWindow(QMainWindow):
         self.strategy = init_setting_of_strategy(self.all_params_info)
         self.timer_.setInterval(self.all_params_info['run_interval']*1000)
         self.timer_.start()
+
+        # 开放停止按钮
+        ui.stopPushButton.setEnabled(True)
+        ui.startPushButton.setEnabled(False)
+        ui.startPushButton.setText("运行中..")
+
+    def onStopPushButtonClickedEvent(self):
+        ui = self.ui
+        # 停止策略运行
+        self.timer_.stop()
+
+        strategy_status_info = {}
+        strategy_status_info['eth'] = 0
+        strategy_status_info['usdt'] = 0
+        strategy_status_info['last'] = 0
+        strategy_status_info['need_buy'] = 0
+        strategy_status_info['need_sell'] = 0
+        strategy_status_info['last_trade_price'] = 0
+        self.updateStrategyStatusInfo(strategy_status_info)
+
+        ui.startPushButton.setEnabled(True)
+        ui.startPushButton.setText("启动")
 
     def loadDefaultSettings(self):
         ui = self.ui

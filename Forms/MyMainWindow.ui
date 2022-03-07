@@ -281,7 +281,11 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="buyLineEdit"/>
+           <widget class="QLineEdit" name="buyLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_11">
@@ -291,7 +295,11 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLineEdit" name="sellLineEdit"/>
+           <widget class="QLineEdit" name="sellLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item row="4" column="0">
            <widget class="QLabel" name="label_12">
@@ -301,7 +309,11 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QLineEdit" name="lastLineEdit"/>
+           <widget class="QLineEdit" name="lastLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item row="5" column="0">
            <widget class="QLabel" name="label_13">
@@ -311,12 +323,19 @@
            </widget>
           </item>
           <item row="5" column="1">
-           <widget class="QLineEdit" name="lastTradingPriceLineEdit"/>
+           <widget class="QLineEdit" name="lastTradingPriceLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
        </widget>
        <widget class="QPushButton" name="stopPushButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>290</x>
