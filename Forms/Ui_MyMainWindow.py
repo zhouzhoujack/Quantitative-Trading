@@ -202,10 +202,10 @@ class Ui_MainWindow(object):
         self.testConnectPushButton.setText(_translate("MainWindow", "测试连接"))
         self.groupBox_4.setTitle(_translate("MainWindow", "策略状态"))
         self.label_7.setText(_translate("MainWindow", "USDT"))
-        self.label_8.setText(_translate("MainWindow", "ETH"))
+        self.label_8.setText(_translate("MainWindow", "ETH(USDT)"))
         self.label_10.setText(_translate("MainWindow", "Buy"))
         self.label_11.setText(_translate("MainWindow", "Sell"))
-        self.label_12.setText(_translate("MainWindow", "last price"))
+        self.label_12.setText(_translate("MainWindow", "last price(amplitude)"))
         self.label_13.setText(_translate("MainWindow", "last trade price"))
         self.stopPushButton.setText(_translate("MainWindow", "停止"))
 # import res_rc

@@ -1,6 +1,5 @@
 <RCC>
   <qresource>
-    <file>img/icon_off.png</file>
-    <file>img/icon_on.png</file>
+    <file>img/icon.png</file>
   </qresource>
 </RCC>

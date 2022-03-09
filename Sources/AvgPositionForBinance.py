@@ -58,7 +58,7 @@ class mid_class():
         except Exception as e:
             msg = "get_account() have a error : {}".format(e)
             logger.error(msg)
-            print(msg)
+            print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
             return False
         return True
 
@@ -73,8 +73,8 @@ class mid_class():
             self.last = self.ticker['last']
         except Exception as e:
             msg = "get_ticker() have a error : {}".format(e)
-            logger.error(meg)
-            print(msg)
+            logger.error(msg)
+            print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
             return False
         return True
 
@@ -149,11 +149,16 @@ class avg_position_class():
         # 需要确保最小交易额大于10usdt，不然会报错
         if self.need_buy > self.Min_Buy_Sell_Amount and self.need_buy*self.jys.last > self.Min_Trade_Quantity:
             self.jys.create_order('market', 'buy', self.jys.low, self.need_buy)
-            logging.critical("Buy: {}  price: {}".format(self.need_buy, self.jys.last))
+            msg = "Buy: {}  price: {}".format(self.need_buy, self.jys.last)
+            logging.critical(msg)
+            print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
 
         elif self.need_sell > self.Min_Buy_Sell_Amount and self.need_sell*self.jys.last > self.Min_Trade_Quantity:
             self.jys.create_order('market', 'sell', self.jys.high, self.need_sell)
-            logging.critical("Sell: {}  price: {}".format(self.need_sell, self.jys.last))
+            msg = "Sell: {}  price: {}".format(self.need_sell, self.jys.last)
+            logging.critical(msg)
+            print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
+
 
     def if_need_trade(self, condition, prama):
         if condition == 'time':
@@ -167,7 +172,6 @@ class avg_position_class():
             #     self.jys.USDT_balance,
             #     self.jys.ETH_balance)
             # logging.info(msg)
-            # print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
 
             if abs((self.jys.last - self.last_trade_price) / self.last_trade_price) >= prama:
                 self.do_juncang()

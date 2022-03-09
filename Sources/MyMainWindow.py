@@ -1,176 +1,53 @@
 """
 对MainWindow的主界面进行详细设置
 """
-import pyautogui as pg
 import time
 import sys
+import os
 
 from threading import Event
 from PyQt5.QtGui import QIcon
-from pynput.mouse import Listener
 from PyQt5 import QtCore
-from PyQt5.QtCore import QEvent, QSettings, QTimer, QRegExp, QObject
-from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import qApp, QMessageBox, QMainWindow, QSystemTrayIcon, QAction, QMenu, QLCDNumber
-from .AvgPositionForBinance import *
+from PyQt5.QtCore import QEvent, QSettings, QTimer, QRegExp, QObject, QThread,pyqtSignal
+from PyQt5.QtWidgets import qApp, QMessageBox, QMainWindow, QAction, QMenu
 from PyQt5.QtGui import QTextCursor
 
-
-# import win32api
-# import win32con, winreg
-import sys,os 
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(path) 
+sys.path.append(path)
+
+from .AvgPositionForBinance import *
 from Forms import Ui_MyMainWindow
-# from Resources import res_rc
+from Resources import res_rc
 
-
-def pushButton_2ClickedEvent(win):
-    ui = win.ui
-
-    # 关闭云同步
-    if win.timer_.isActive():
-        win.timer_.stop()               # 停止云同步运行
-        win.duration = win.resetDuration(interval)
-
-    win.trayIcon_.setToolTip("桌面日历自动云同步")
-    ui.lcdNumber.display("00:00:00")
-    ui.lineEdit.setEnabled(True)
-    ui.pushButton.setEnabled(True)
-    ui.pushButton_3.setEnabled(True)
-    win.setWindowIcon(QIcon(r":/img/icon_off.png"))
-    ui.pushButton.setText("开始执行")
-
-    print("结束执行")
-
-def pushButton_3ClickedEvent(win):
-    ui = win.ui
-    # 初始化云同步步骤的按钮的坐标位置
-    def on_click(x, y, button, pressed):
-        global clickTimes
-        if pressed:
-            print('Pressed at X: {} Y: {}'.format(x, y))
-            pos.append([x, y])
-            clickTimes += 1
-
-        if clickTimes == 3:
-            return False
-
-    global pos
-    pos = []
-
-    QMessageBox.information(win, "提示", "请手动执行一次桌面日历的云同步!") 
-    win.setVisible(False)
-
-    # 连接事件以及释放
-    # 这里的Listener是监听鼠标点击事件来获取桌面坐标
+class TimeThread(QThread):
     """
-    TODO (多线程执行完未完全退出)
+    多线程动态显示时间
     """
-    with Listener(on_click=on_click) as listener:
-        listener.join()
+    time_signal = pyqtSignal(str)      # 定义时间变化信号
 
-    global clickTimes
-    clickTimes = 0
+    def __init__(self):
+        super().__init__()
+        self.run_seconds = 0
 
-    # 将button的坐标保存到默认设置中，以便下次重启使用
-    settings = QSettings("HXZZ", "AutoCloudSync")
-    settings.beginGroup("DefaultParams")
-    settings.setValue("pos", pos)
-    settings.endGroup()
+    def run(self):
+        """
+        开一条线程，在状态栏显示策略的运行时间
+        """
+        while True:
+            self.time_signal.emit(seconds2time(self.run_seconds))            # 发送信号让statusbar更新时间
+            time.sleep(1)
+            self.run_seconds += 1
 
-    win.setVisible(True)
-    
-    QMessageBox.information(win, "提示", "自动云同步设置完成!")
-    # QTimer.singleShot(1000, )
-  
-    ui.pushButton.setEnabled(True)
-    ui.pushButton_2.setEnabled(True)
-
-def checkBoxClickedEvent(win):
-    pass
-    # ui = win.ui
-    # changedFlag = ui.checkBox.isChecked()
-    #
-    # # 第一次设置自启动时需要检测是否初始化坐标了
-    # # 若没有，那么不允许设置自启动
-    # if changedFlag and len(pos) != 3:
-    #     QMessageBox.warning(win, "警告", "需要进行初始化操作!")
-    #     ui.checkBox.setChecked(False)
-    #     return
-    #
-    # if changedFlag:
-    # # TODO 开机自动云同步一次，并隐藏在后台执行
-    #     AutoRun(switch='open', key_name='AutoCloudSync')
-    # else :
-    #     AutoRun(switch='close', key_name='AutoCloudSync')
-
-# def checkKey(key_name='AutoCloudSync',
-#             reg_root=win32con.HKEY_CURRENT_USER,  # 根节点
-#             reg_path=r"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",  # 键的路径
-#             abspath=os.path.abspath(sys.argv[0])
-#             ):
-#     """
-#     检测自启动的注册表是否已经注册程序
-#     :param key_name: #  要查询的键名
-#     :param reg_root: # 根节点
-#         #win32con.HKEY_CURRENT_USER
-#         #win32con.HKEY_CLASSES_ROOT
-#         #win32con.HKEY_CURRENT_USER
-#         #win32con.HKEY_LOCAL_MACHINE
-#         #win32con.HKEY_USERS
-#         #win32con.HKEY_CURRENT_CONFIG
-#     :param reg_path: #  键的路径
-#     :return: feedback(True 则已经注册过否则为False)
-#     """
-#     reg_flags = win32con.WRITE_OWNER | win32con.KEY_WOW64_64KEY | win32con.KEY_ALL_ACCESS
-#     feedback = False
-#     try:
-#         key = winreg.OpenKey(reg_root, reg_path, 0, reg_flags)
-#         location, type = winreg.QueryValueEx(key, key_name)
-#         feedback = True
-#         if location != abspath:
-#             feedback = 1
-#             print('键存在，但程序位置发生改变')
-#     except FileNotFoundError as e:
-#         print("键不存在", e)
-#     except PermissionError as e:
-#         print("权限不足", e)
-#     except:
-#         print("Error")
-#
-#     return feedback
-
-# def AutoRun(switch="open",
-#             key_name='AutoCloudSync',
-#             abspath=os.path.abspath(sys.argv[0])):
-#     # 如果没有自定义路径，就用os.path.abspath(sys.argv[0])获取主程序的路径，如果主程序已经打包成exe格式，就相当于获取exe文件的路径
-#
-#     flag = checkKey(reg_root=win32con.HKEY_CURRENT_USER,
-#                         reg_path=r"Software\\Microsoft\\Windows\\CurrentVersion\\Run",  # 键的路径
-#                         key_name=key_name,
-#                         abspath=abspath)
-#     # 注册表项名
-#     KeyName = r'Software\\Microsoft\\Windows\\CurrentVersion\\Run'
-#     key = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER, KeyName, 0, win32con.KEY_ALL_ACCESS)
-#     if switch == "open":
-#         # 异常处理
-#         try:
-#             if not flag:
-#                 win32api.RegSetValueEx(key, key_name, 0, win32con.REG_SZ, abspath)
-#                 win32api.RegCloseKey(key)
-#                 print('开机自启动添加成功！')
-#         except:
-#             print('添加失败，未知错误')
-#
-#     elif switch == "close":
-#         try:
-#             if flag:
-#                 win32api.RegDeleteValue(key, key_name)  # 删除值
-#                 win32api.RegCloseKey(key)
-#                 print('成功删除键！')
-#         except:
-#             print('删除失败,未知错误！')
+def seconds2time(seconds):
+    # 将秒转换为xx-day 00:00:00格式的时间
+    d = seconds //  (3600 * 24)
+    h = (seconds // 3600) % 24
+    m = (seconds // 60) % 60
+    s = seconds % 60
+    h = str(h) if h >= 10 else '0' + str(h)
+    m = str(m) if m >= 10 else '0' + str(m)
+    s = str(s) if s >= 10 else '0' + str(s)
+    return "%s day %s:%s:%s"%(d, h, m, s)
 
 # 重定向信号
 class EmittingStr(QtCore.QObject):
@@ -193,6 +70,10 @@ class MainWindow(QMainWindow):
 
         # 定时器用于定时执行脚本
         self.timer_ = QTimer(self)
+
+        # 显示动态时间的线程
+        self.run_time_thread = TimeThread()
+        self.run_time_thread.time_signal.connect(self.showRunTime)
 
         # 系统托盘
         # self.trayIcon_ = QSystemTrayIcon()
@@ -224,6 +105,7 @@ class MainWindow(QMainWindow):
 
     def windowSetting(self):
         self.setFixedSize(self.width(), self.height())
+        self.setWindowIcon(QIcon(":/img/icon.png"));
 
     def widgetsSetting(self):
         self.ui.startPushButton.clicked.connect(lambda : self.onStartPushButtonClickedEvent())
@@ -300,14 +182,21 @@ class MainWindow(QMainWindow):
         self.timer_.setInterval(self.all_params_info['run_interval']*1000)
         self.timer_.start()
 
+        # 开始计算策略的执行时间，显示在状态栏
+        self.run_time_thread.start()
+
         # 开放停止按钮
         ui.stopPushButton.setEnabled(True)
         ui.startPushButton.setEnabled(False)
         ui.startPushButton.setText("运行中..")
 
+    def showRunTime(self, run_time):
+        self.statusBar().showMessage(run_time)
+
     def onStopPushButtonClickedEvent(self):
         ui = self.ui
         # 停止策略运行
+        self.run_time_thread.quit()
         self.timer_.stop()
 
         strategy_status_info = {}
@@ -321,6 +210,8 @@ class MainWindow(QMainWindow):
 
         ui.startPushButton.setEnabled(True)
         ui.startPushButton.setText("启动")
+
+        ui.logTextEdit.clear()
 
     def loadDefaultSettings(self):
         ui = self.ui
@@ -351,38 +242,19 @@ class MainWindow(QMainWindow):
     def updateStrategyStatusInfo(self, status_info):
         ui = self.ui
         ui.usdtLineEdit.setText(str(status_info['usdt']))
-        ui.ethLineEdit.setText(str(status_info['eth'])+'('+str(status_info['eth']*status_info['last'])+')')
-        ui.buyLineEdit.setText(str(status_info['need_buy']))
-        ui.sellLineEdit.setText(str(status_info['need_sell']))
-        ui.lastLineEdit.setText(str(status_info['last']))
+        eth_usdt = status_info['eth']*status_info['last']
+
+        ui.ethLineEdit.setText(str(status_info['eth'])+'('+str(round(eth_usdt, 2))+')')
+
+        ui.buyLineEdit.setText(str(round(status_info['need_buy'], 6)))
+        ui.sellLineEdit.setText(str(round(status_info['need_sell'], 6)))
+
+        if status_info['last_trade_price'] != 0:
+            amplitude = 100*(status_info['last']-status_info['last_trade_price'])/status_info['last_trade_price']
+        else:
+            amplitude = 0
+
+        ui.lastLineEdit.setText(str(status_info['last'])+'('+str(round(amplitude, 4))+'%)')
         ui.lastTradingPriceLineEdit.setText(str(status_info['last_trade_price']))
 
-    def changeEvent(self, event):
-        """
-        重写窗口状态改变函数
-        """
-        pass
-
-        # def _showTrayIconMesg():
-        #     self.trayIcon_.showMessage("桌面日历自动云同步","已最小化至托盘")
-        #
-        # if event.type() == QtCore.QEvent.WindowStateChange:
-        #     if self.windowState() & QtCore.Qt.WindowMinimized:
-        #         event.ignore()
-        #         print("窗口最小化")
-        #         quitAction = QAction(u"退出", self, triggered=qApp.quit)
-        #         resetScriptAction = QAction(u"重置运行", self, triggered=self.resetScript)
-        #         menu = QMenu()
-        #         menu.addAction(resetScriptAction)
-        #         menu.addAction(quitAction)
-        #         self.trayIcon_.setContextMenu(menu)
-        #         self.trayIcon_.setIcon(QIcon(r":/img/icon_off.png"))
-        #
-        #         if not self.ui.pushButton.isEnabled():
-        #             self.trayIcon_.setIcon(QIcon(r":/img/icon_on.png"))
-        #
-        #         QTimer.singleShot(1000, lambda : _showTrayIconMesg())
-        #
-        #         self.hide()
-        #         self.trayIcon_.show()
                 
