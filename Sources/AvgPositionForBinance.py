@@ -25,11 +25,13 @@ def set_logging_helper():
 logger = set_logging_helper()       # 记录日志信息
 
 def get_exchange(apikey, secret):
-    exchange = ccxt.binance({
+    exchange = ccxt.binance(
+        {
             'proxies': {
             'http': 'http://127.0.0.1:8000',
             'https': 'http://127.0.0.1:8000'
         },
+        'options': {'adjustForTimeDifference': True},
         'apiKey': apikey,
         'secret': secret,
     })
@@ -125,6 +127,7 @@ class avg_position_class():
 
     def make_need_account_info(self):
         self.strategy_status_info = {}
+
         if(not self.jys.refreash_data()):
             return False, self.strategy_status_info
 
@@ -143,6 +146,7 @@ class avg_position_class():
         self.strategy_status_info['need_buy'] = self.need_buy
         self.strategy_status_info['need_sell'] = self.need_sell
         self.strategy_status_info['last_trade_price'] = self.last_trade_price
+
         return True, self.strategy_status_info
 
     def do_juncang(self):

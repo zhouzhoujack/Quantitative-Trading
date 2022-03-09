@@ -9,7 +9,7 @@ from threading import Event
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtCore
 from PyQt5.QtCore import QEvent, QSettings, QTimer, QRegExp, QObject, QThread,pyqtSignal
-from PyQt5.QtWidgets import qApp, QMessageBox, QMainWindow, QAction, QMenu
+from PyQt5.QtWidgets import qApp, QMessageBox, QMainWindow, QAction, QMenu, QLabel
 from PyQt5.QtGui import QTextCursor
 
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,15 +28,22 @@ class TimeThread(QThread):
     def __init__(self):
         super().__init__()
         self.run_seconds = 0
+        self.stop_flag = False      # 控制线程的停止
+
+    def stopThread(self):
+        self.stop_flag = True
+        self.run_seconds = 0
 
     def run(self):
         """
         开一条线程，在状态栏显示策略的运行时间
         """
-        while True:
+        self.stop_flag = False
+        while(not self.stop_flag):
             self.time_signal.emit(seconds2time(self.run_seconds))            # 发送信号让statusbar更新时间
             time.sleep(1)
             self.run_seconds += 1
+
 
 def seconds2time(seconds):
     # 将秒转换为xx-day 00:00:00格式的时间
@@ -107,11 +114,21 @@ class MainWindow(QMainWindow):
         self.setFixedSize(self.width(), self.height())
         self.setWindowIcon(QIcon(":/img/icon.png"));
 
+        # status bar
+        self.connect_status_label = QLabel(self)
+        status_bar = self.statusBar()
+        status_bar.addPermanentWidget(self.connect_status_label)
+
     def widgetsSetting(self):
         self.ui.startPushButton.clicked.connect(lambda : self.onStartPushButtonClickedEvent())
         self.ui.stopPushButton.clicked.connect(lambda: self.onStopPushButtonClickedEvent())
+        self.ui.clearPushButton.clicked.connect(lambda: self.onClearPushButtonClickedEvent())
         self.ui.testConnectPushButton.clicked.connect(lambda : self.onTestConnectPushButtonClickedEvent())        # 下面将输出重定向到textEdit中
         self.timer_.timeout.connect(lambda: self.refreshTimerSlot())
+
+    def onClearPushButtonClickedEvent(self):
+        # 清除日志
+        self.ui.logTextEdit.clear()
 
     def onTestConnectPushButtonClickedEvent(self):
         ui = self.ui
@@ -130,8 +147,10 @@ class MainWindow(QMainWindow):
 
         if not connect_flag:
             QMessageBox.critical(self, "Connect Error", " 连接交易所失败，请检查日志文件！", QMessageBox.Yes)
+            self.connect_status_label.setText("交易所连接失败")
         else:
             QMessageBox.information(self, "Connect Successfully", " 连接交易所成功！", QMessageBox.Yes)
+            self.connect_status_label.setText("交易所连接成功")
 
         ui.testConnectPushButton.setEnabled(True)
 
@@ -191,12 +210,14 @@ class MainWindow(QMainWindow):
         ui.startPushButton.setText("运行中..")
 
     def showRunTime(self, run_time):
-        self.statusBar().showMessage(run_time)
+        self.statusBar().showMessage("策略已运行: "+run_time)
 
     def onStopPushButtonClickedEvent(self):
         ui = self.ui
+
         # 停止策略运行
-        self.run_time_thread.quit()
+        self.run_time_thread.stopThread()
+        self.run_time_thread.wait();
         self.timer_.stop()
 
         strategy_status_info = {}
@@ -236,8 +257,11 @@ class MainWindow(QMainWindow):
         # 定时器的槽函数
         flag, strategy_status_info = self.strategy.make_need_account_info()
         if(flag):
+            self.connect_status_label.setText("交易所连接成功")
             self.strategy.if_need_trade('price', self.all_params_info['volatility'])
             self.updateStrategyStatusInfo(strategy_status_info)
+        else:
+            self.connect_status_label.setText("交易所连接失败")
 
     def updateStrategyStatusInfo(self, status_info):
         ui = self.ui
@@ -256,5 +280,11 @@ class MainWindow(QMainWindow):
 
         ui.lastLineEdit.setText(str(status_info['last'])+'('+str(round(amplitude, 4))+'%)')
         ui.lastTradingPriceLineEdit.setText(str(status_info['last_trade_price']))
+
+    def closeEvent(self, event):
+        if(self.run_time_thread.isRunning()):
+            self.run_time_thread.stopThread()
+            self.run_time_thread.wait()
+
 
                 
