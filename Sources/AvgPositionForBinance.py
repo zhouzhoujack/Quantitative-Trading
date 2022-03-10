@@ -170,14 +170,8 @@ class avg_position_class():
                 self.do_juncang()
                 self.last_time = time.time()
         if condition == 'price':
-            # msg = "last price: {} last_trade_price: {} usdt_balance: {} eth_balance: {}".format(
-            #     self.jys.last,
-            #     self.last_trade_price,
-            #     self.jys.USDT_balance,
-            #     self.jys.ETH_balance)
-            # logging.info(msg)
-
-            if abs((self.jys.last - self.last_trade_price) / self.last_trade_price) >= prama:
+            vol = abs((self.jys.last - self.last_trade_price) / self.last_trade_price)*100
+            if vol >= prama:
                 self.do_juncang()
                 self.last_trade_price = self.jys.last
 
