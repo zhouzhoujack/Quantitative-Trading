@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1212</width>
-    <height>688</height>
+    <width>1256</width>
+    <height>754</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
       <x>10</x>
       <y>10</y>
       <width>411</width>
-      <height>651</height>
+      <height>721</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -122,7 +122,7 @@
           <x>0</x>
           <y>200</y>
           <width>401</width>
-          <height>111</height>
+          <height>151</height>
          </rect>
         </property>
         <property name="title">
@@ -134,7 +134,7 @@
            <x>0</x>
            <y>20</y>
            <width>401</width>
-           <height>67</height>
+           <height>131</height>
           </rect>
          </property>
          <layout class="QFormLayout" name="formLayout_3">
@@ -175,6 +175,43 @@
           <item row="2" column="1">
            <widget class="QLineEdit" name="intervalLineEdit"/>
           </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>钉钉机器人</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="tokenLineEdit">
+            <property name="inputMask">
+             <string/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="placeholderText">
+             <string>access_token</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="ding_secretLineEdit">
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
+            </property>
+            <property name="placeholderText">
+             <string>secret</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </widget>
@@ -182,8 +219,8 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>590</y>
-          <width>401</width>
+          <y>650</y>
+          <width>411</width>
           <height>20</height>
          </rect>
         </property>
@@ -195,8 +232,8 @@
         <property name="geometry">
          <rect>
           <x>110</x>
-          <y>610</y>
-          <width>81</width>
+          <y>680</y>
+          <width>91</width>
           <height>31</height>
          </rect>
         </property>
@@ -208,7 +245,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>610</y>
+          <y>680</y>
           <width>91</width>
           <height>31</height>
          </rect>
@@ -221,7 +258,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>320</y>
+          <y>360</y>
           <width>401</width>
           <height>201</height>
          </rect>
@@ -344,9 +381,9 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>200</x>
-          <y>610</y>
-          <width>81</width>
+          <x>220</x>
+          <y>680</y>
+          <width>91</width>
           <height>31</height>
          </rect>
         </property>
@@ -360,9 +397,9 @@
         </property>
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>610</y>
-          <width>81</width>
+          <x>320</x>
+          <y>680</y>
+          <width>91</width>
           <height>31</height>
          </rect>
         </property>
@@ -379,8 +416,8 @@
      <rect>
       <x>430</x>
       <y>10</y>
-      <width>771</width>
-      <height>651</height>
+      <width>821</width>
+      <height>721</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -396,8 +433,6 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
- <resources>
-  <include location="../Resources/res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

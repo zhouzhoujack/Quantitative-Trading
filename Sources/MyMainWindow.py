@@ -44,7 +44,6 @@ class TimeThread(QThread):
             time.sleep(1)
             self.run_seconds += 1
 
-
 def seconds2time(seconds):
     # 将秒转换为xx-day 00:00:00格式的时间
     d = seconds //  (3600 * 24)
@@ -72,9 +71,6 @@ class MainWindow(QMainWindow):
         sys.stdout = EmittingStr(textWritten=self.outputWritten)
         sys.stderr = EmittingStr(textWritten=self.outputWritten)
 
-        # 定时器执行的间隔时间
-        # self.duration = self.resetDuration(interval)
-
         # 定时器用于定时执行脚本
         self.timer_ = QTimer(self)
 
@@ -82,11 +78,6 @@ class MainWindow(QMainWindow):
         self.run_time_thread = TimeThread()
         self.run_time_thread.time_signal.connect(self.showRunTime)
 
-        # 系统托盘
-        # self.trayIcon_ = QSystemTrayIcon()
-        # self.trayIcon_.activated.connect(self.trayClick)
-        # self.trayIcon_.installEventFilter(MouseHoverEvent(self.trayIcon_))
-        # self.trayIcon_.setToolTip("桌面日历自动云同步")
         self.all_params_info = {}
 
         # 界面的UI初始化,这部分代码由QT编译器自动生成，不用动
@@ -176,6 +167,8 @@ class MainWindow(QMainWindow):
         auto_start_flag = ui.checkBox.isChecked()
         min_trading_limit = ui.minTradeQuanLineEdit.text()
         run_interval = ui.intervalLineEdit.text()
+        ding_token = ui.tokenLineEdit.text()
+        ding_secret = ui.secretLineEdit.text()
 
         if len(min_trading_limit) == 0 or len(run_interval) == 0:
             QMessageBox.warning(self, "Warning", "请提供其他设置!", QMessageBox.Yes)
@@ -189,6 +182,8 @@ class MainWindow(QMainWindow):
         self.all_params_info['auto_start_flag'] = auto_start_flag
         self.all_params_info['min_trading_limit'] = float(min_trading_limit)
         self.all_params_info['run_interval'] = int(run_interval)
+        self.all_params_info['ding_access_token'] = ding_token
+        self.all_params_info['ding_secret'] = ding_secret
 
         # 将页面参数保存到默认设置中，以便下次应用重启使用
         settings = QSettings("hxzz", "Quan_trading")
@@ -245,13 +240,18 @@ class MainWindow(QMainWindow):
         if all_params_info is None:
             return
 
-        ui.keyLineEdit.setText(all_params_info['key'])
-        ui.secretLineEdit.setText(all_params_info['secret'])
-        ui.volaLineEdit.setText(str(all_params_info['volatility']))
-        ui.minAmountLineEdit.setText(str(all_params_info['min_amount']))
-        ui.checkBox.setCheckable(all_params_info['auto_start_flag'])
-        ui.minTradeQuanLineEdit.setText(str(all_params_info['min_trading_limit']))
-        ui.intervalLineEdit.setText(str(all_params_info['run_interval']))
+        try:
+            ui.keyLineEdit.setText(all_params_info['key'])
+            ui.secretLineEdit.setText(all_params_info['secret'])
+            ui.volaLineEdit.setText(str(all_params_info['volatility']))
+            ui.minAmountLineEdit.setText(str(all_params_info['min_amount']))
+            ui.checkBox.setCheckable(all_params_info['auto_start_flag'])
+            ui.minTradeQuanLineEdit.setText(str(all_params_info['min_trading_limit']))
+            ui.intervalLineEdit.setText(str(all_params_info['run_interval']))
+            ui.tokenLineEdit.setText(all_params_info['ding_access_token'])
+            ui.ding_secretLineEdit.setText(all_params_info['ding_secret'])
+        except Exception as e:
+            print("Miss some default params!")
 
     def refreshTimerSlot(self):
         # 定时器的槽函数
@@ -279,7 +279,7 @@ class MainWindow(QMainWindow):
             amplitude = 0
 
         ui.lastLineEdit.setText(str(status_info['last'])+'('+str(round(amplitude, 4))+'%)')
-        ui.lastTradingPriceLineEdit.setText(str(status_info['last_trade_price']))
+        ui.lastTradingPriceLineEdit.setText(str(round(status_info['last_trade_price'], 2)))
 
     def closeEvent(self, event):
         if(self.run_time_thread.isRunning()):

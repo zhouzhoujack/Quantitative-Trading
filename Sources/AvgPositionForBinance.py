@@ -2,8 +2,7 @@ import ccxt
 import time
 import sys
 import logging
-from PyQt5.QtWidgets import QMessageBox
-
+from .MessageHelper import *
 
 def set_logging_helper():
     logger = logging.getLogger()
@@ -61,6 +60,7 @@ class mid_class():
             msg = "get_account() have a error : {}".format(e)
             logger.error(msg)
             print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
+            dingding_msg_robot.ding_message(msg)
             return False
         return True
 
@@ -77,6 +77,7 @@ class mid_class():
             msg = "get_ticker() have a error : {}".format(e)
             logger.error(msg)
             print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
+            dingding_msg_robot.ding_message(msg)
             return False
         return True
 
@@ -118,12 +119,17 @@ class avg_position_class():
     def __init__(self, mid_class, min_bs_amount, min_trade_quantity):
         self.jys = mid_class
         self.last_time = time.time()
-        self.last_trade_price = mid_class.last
         self.Buy_count = 0
         self.Sell_count = 0
         self.Min_Buy_Sell_Amount = min_bs_amount
         self.Min_Trade_Quantity = min_trade_quantity
         self.strategy_status_info = {}
+        self.last_trade_price = self.correct_last_trade_price()
+
+    def correct_last_trade_price(self):
+        # 有时断点重启，需要自动更新到上次的均仓价格
+        if(self.jys.USDT_balance != 0):
+            return self.jys.USDT_balance / self.jys.ETH_balance
 
     def make_need_account_info(self):
         self.strategy_status_info = {}
@@ -156,13 +162,14 @@ class avg_position_class():
             msg = "Buy: {}  price: {}".format(self.need_buy, self.jys.last)
             logging.critical(msg)
             print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
+            dingding_msg_robot.ding_message(msg)
 
         elif self.need_sell > self.Min_Buy_Sell_Amount and self.need_sell*self.jys.last > self.Min_Trade_Quantity:
             self.jys.create_order('market', 'sell', self.jys.high, self.need_sell)
             msg = "Sell: {}  price: {}".format(self.need_sell, self.jys.last)
             logging.critical(msg)
             print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
-
+            dingding_msg_robot.ding_message(msg)
 
     def if_need_trade(self, condition, prama):
         if condition == 'time':
@@ -189,34 +196,12 @@ def test_connect_exchange(apiKey, secret):
 def init_setting_of_strategy(params):
     # 利用页面的参数初始化策略
     exchange = get_exchange(params['key'], params['secret'])
+    dingding_msg_robot = get_dingding_msg_helper(params['ding_access_token'], params['ding_secret'])
     test_mid = mid_class(exchange)
     test_mid.refreash_data()
     strategy = avg_position_class(test_mid, params['min_amount'], params['min_trading_limit'])
     strategy.make_need_account_info()
     return strategy
 
-def main():
-    pass
-    # apiKey = ''
-    # secret = ''
-    # exchange = get_exchange(apiKey, secret)
-    #
-    # Volatility = 0.03               # 波动率
-    # Min_Buy_Sell_Amount = 0.001     # 最小交易数量
-    # Min_Trade_Quantity = 10         # 币安交易所限制的最小交易额
-    #
-    # test_mid = mid_class(exchange)
-    #
-    # test_mid.refreash_data()
-    # test_juncang = avg_position_class(test_mid, Min_Buy_Sell_Amount, Min_Trade_Quantity)
-    #
-    # test_juncang.make_need_account_info()
-    # # test_juncang.do_juncang()
-    #
-    # while (True):
-    #     time.sleep(10)
-    #     if(test_juncang.make_need_account_info()):
-    #         test_juncang.if_need_trade('price', Volatility)
-
 if __name__ == '__main__':
-    main()
+    pass
