@@ -128,11 +128,14 @@ class MainWindow(QMainWindow):
         key = ui.keyLineEdit.text()
         secret = ui.secretLineEdit.text()
 
+        access_token = ui.tokenLineEdit.text()
+        ding_secret = ui.secretLineEdit.text()
+
         if len(key) == 0 or len(secret) == 0:
             QMessageBox.warning(self, "Warning", "请提供交易所API密钥!", QMessageBox.Yes)
             return
 
-        connect_flag, usdt, eth  = test_connect_exchange(key, secret)
+        connect_flag, usdt, eth  = test_connect_exchange(key, secret, access_token, ding_secret)
         ui.usdtLineEdit.setText(str(usdt))
         ui.ethLineEdit.setText(str(eth))
 
@@ -168,7 +171,7 @@ class MainWindow(QMainWindow):
         min_trading_limit = ui.minTradeQuanLineEdit.text()
         run_interval = ui.intervalLineEdit.text()
         ding_token = ui.tokenLineEdit.text()
-        ding_secret = ui.secretLineEdit.text()
+        ding_secret = ui.ding_secretLineEdit.text()
 
         if len(min_trading_limit) == 0 or len(run_interval) == 0:
             QMessageBox.warning(self, "Warning", "请提供其他设置!", QMessageBox.Yes)

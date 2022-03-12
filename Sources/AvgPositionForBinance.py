@@ -37,7 +37,7 @@ def get_exchange(apikey, secret):
     return exchange
 
 class mid_class():
-    def __init__(self, this_exchange):
+    def __init__(self, robot, this_exchange):
         '''
         初始化数据填充交易所的信息，首次获取价格，首次获取account信息
         设定好密钥……
@@ -47,6 +47,7 @@ class mid_class():
         self.init_timestamp = time.time()
         self.exchange = this_exchange
         self.symbol = 'ETH/USDT'
+        self.robot = robot
 
     def get_account(self):
         '''
@@ -60,7 +61,7 @@ class mid_class():
             msg = "get_account() have a error : {}".format(e)
             logger.error(msg)
             print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
-            dingding_msg_robot.ding_message(msg)
+            self.robot.ding_message(msg)
             return False
         return True
 
@@ -77,7 +78,7 @@ class mid_class():
             msg = "get_ticker() have a error : {}".format(e)
             logger.error(msg)
             print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
-            dingding_msg_robot.ding_message(msg)
+            self.robot.ding_message(msg)
             return False
         return True
 
@@ -116,7 +117,7 @@ class mid_class():
         return True
 
 class avg_position_class():
-    def __init__(self, mid_class, min_bs_amount, min_trade_quantity):
+    def __init__(self, robot, mid_class, min_bs_amount, min_trade_quantity):
         self.jys = mid_class
         self.last_time = time.time()
         self.Buy_count = 0
@@ -125,6 +126,7 @@ class avg_position_class():
         self.Min_Trade_Quantity = min_trade_quantity
         self.strategy_status_info = {}
         self.last_trade_price = self.correct_last_trade_price()
+        self.robot = robot
 
     def correct_last_trade_price(self):
         # 有时断点重启，需要自动更新到上次的均仓价格
@@ -140,6 +142,9 @@ class avg_position_class():
         self.B = self.jys.ETH_balance
         self.money = self.jys.USDT_balance
         now_price = self.jys.last
+
+        # msg = "{} {} {} ".format(self.B, self.money, now_price)
+        # self.robot.ding_message(msg)
 
         self.total_money = self.B * now_price + self.money
         self.half_money = self.total_money / 2
@@ -162,14 +167,14 @@ class avg_position_class():
             msg = "Buy: {}  price: {}".format(self.need_buy, self.jys.last)
             logging.critical(msg)
             print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
-            dingding_msg_robot.ding_message(msg)
+            self.robot.ding_message(msg)
 
         elif self.need_sell > self.Min_Buy_Sell_Amount and self.need_sell*self.jys.last > self.Min_Trade_Quantity:
             self.jys.create_order('market', 'sell', self.jys.high, self.need_sell)
             msg = "Sell: {}  price: {}".format(self.need_sell, self.jys.last)
             logging.critical(msg)
             print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
-            dingding_msg_robot.ding_message(msg)
+            self.robot.ding_message(msg)
 
     def if_need_trade(self, condition, prama):
         if condition == 'time':
@@ -182,12 +187,14 @@ class avg_position_class():
                 self.do_juncang()
                 self.last_trade_price = self.jys.last
 
-def test_connect_exchange(apiKey, secret):
+def test_connect_exchange(apiKey, secret, ding_token, ding_secret):
     # 测试所提供的Api key和secret是否能连接上交易所
+    # 同时测试钉钉机器人是否连接
     # 若可以，则返回账户余额信息
     # 若无法连接，则返回连接失败，并返回错误的账户信息
     exchange = get_exchange(apiKey, secret)
-    test_mid = mid_class(exchange)
+    dingding_msg_robot = get_dingding_msg_helper(ding_token, ding_secret)
+    test_mid = mid_class(dingding_msg_robot, exchange)
     if(test_mid.refreash_data()):
         return True, test_mid.USDT_balance, test_mid.ETH_balance
     else:
@@ -197,9 +204,9 @@ def init_setting_of_strategy(params):
     # 利用页面的参数初始化策略
     exchange = get_exchange(params['key'], params['secret'])
     dingding_msg_robot = get_dingding_msg_helper(params['ding_access_token'], params['ding_secret'])
-    test_mid = mid_class(exchange)
+    test_mid = mid_class(dingding_msg_robot, exchange)
     test_mid.refreash_data()
-    strategy = avg_position_class(test_mid, params['min_amount'], params['min_trading_limit'])
+    strategy = avg_position_class(dingding_msg_robot, test_mid, params['min_amount'], params['min_trading_limit'])
     strategy.make_need_account_info()
     return strategy
 

@@ -11,16 +11,18 @@ class DingDingMessageHelper :
     def __init__(self, token, secret):
         self.access_token = token
         self.secret = secret
+        self.proxy = \
+        {
+            'http': 'http://127.0.0.1:8000',
+            'https': 'http://127.0.0.1:8000'
+        }
+        self.url = "https://oapi.dingtalk.com/robot/send?access_token=%s&timestamp=%s&sign=%s"
+
 
     def ding_message(self, text):
         timestamp, sign = self.get_timestamp_and_sign()
 
-        # headers = {'Content-Type': 'application/json;charset=utf-8'}
-        proxies = {
-            'http': 'http://127.0.0.1:8000',
-            'https': 'http://127.0.0.1:8000'
-        }
-        api_url = "https://oapi.dingtalk.com/robot/send?access_token=%s&timestamp=%s&sign=%s" % (self.access_token, timestamp, sign)
+        api_url = self.url % (self.access_token, timestamp, sign)
 
         json_text = \
         {
@@ -28,11 +30,17 @@ class DingDingMessageHelper :
             "at": { "isAtAll": False },
             "text": { "content": text }
         }
+        try:
+            r = requests.post(api_url, json=json_text, proxies=self.proxy)
+            return
+        except Exception as e:
+            pass
 
         try:
-            r = requests.post(api_url, json=json_text, proxies=proxies)
+            r = requests.post(api_url, json=json_text)
+            return
         except Exception as e:
-            print(e)
+            pass
 
     def get_timestamp_and_sign(self):
         timestamp = str(round(time.time() * 1000))
@@ -49,5 +57,6 @@ def get_dingding_msg_helper(token, secret):
 
 if __name__ == "__main__":
     pass
-    # "https://oapi.dingtalk.com/robot/send?access_token=39112f6272375d567dae642307290013685802daeb5df56d7fca2a0ecb4ee07f"
-    # "SECf7a986ec8da03314c7f2e272cb7142b17dce8c9972ab3fb7fe13029f935e76f0"
+    # ding = get_dingding_msg_helper('39112f6272375d567dae642307290013685802daeb5df56d7fca2a0ecb4ee07f',
+    #                         'xxx')
+    # ding.ding_message("Test Class for Test")
