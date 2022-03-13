@@ -129,7 +129,7 @@ class MainWindow(QMainWindow):
         secret = ui.secretLineEdit.text()
 
         access_token = ui.tokenLineEdit.text()
-        ding_secret = ui.secretLineEdit.text()
+        ding_secret = ui.ding_secretLineEdit.text()
 
         if len(key) == 0 or len(secret) == 0:
             QMessageBox.warning(self, "Warning", "请提供交易所API密钥!", QMessageBox.Yes)
@@ -198,6 +198,8 @@ class MainWindow(QMainWindow):
         self.strategy = init_setting_of_strategy(self.all_params_info)
         self.timer_.setInterval(self.all_params_info['run_interval']*1000)
         self.timer_.start()
+
+
 
         # 开始计算策略的执行时间，显示在状态栏
         self.run_time_thread.start()

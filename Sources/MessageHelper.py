@@ -20,10 +20,6 @@ class DingDingMessageHelper :
 
 
     def ding_message(self, text):
-        timestamp, sign = self.get_timestamp_and_sign()
-
-        api_url = self.url % (self.access_token, timestamp, sign)
-
         json_text = \
         {
             "msgtype": "text",
@@ -31,12 +27,16 @@ class DingDingMessageHelper :
             "text": { "content": text }
         }
         try:
+            timestamp, sign = self.get_timestamp_and_sign()
+            api_url = self.url % (self.access_token, timestamp, sign)
             r = requests.post(api_url, json=json_text, proxies=self.proxy)
             return
         except Exception as e:
             pass
 
         try:
+            timestamp, sign = self.get_timestamp_and_sign()
+            api_url = self.url % (self.access_token, timestamp, sign)
             r = requests.post(api_url, json=json_text)
             return
         except Exception as e:

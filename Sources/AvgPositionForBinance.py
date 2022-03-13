@@ -130,8 +130,11 @@ class avg_position_class():
 
     def correct_last_trade_price(self):
         # 有时断点重启，需要自动更新到上次的均仓价格
-        if(self.jys.USDT_balance != 0):
-            return self.jys.USDT_balance / self.jys.ETH_balance
+        try:
+            if(self.jys.USDT_balance != 0):
+                return self.jys.USDT_balance / self.jys.ETH_balance
+        except:
+            pass
 
     def make_need_account_info(self):
         self.strategy_status_info = {}
