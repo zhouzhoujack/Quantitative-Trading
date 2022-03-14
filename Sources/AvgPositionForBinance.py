@@ -171,6 +171,7 @@ class avg_position_class():
             logging.critical(msg)
             print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
             self.robot.ding_message(msg)
+            return True
 
         elif self.need_sell > self.Min_Buy_Sell_Amount and self.need_sell*self.jys.last > self.Min_Trade_Quantity:
             self.jys.create_order('market', 'sell', self.jys.high, self.need_sell)
@@ -178,16 +179,14 @@ class avg_position_class():
             logging.critical(msg)
             print("[{}] {}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg))
             self.robot.ding_message(msg)
+            return True
+
+        return False
 
     def if_need_trade(self, condition, prama):
-        if condition == 'time':
-            if time.time() - self.last_time > prama:
-                self.do_juncang()
-                self.last_time = time.time()
         if condition == 'price':
             vol = abs((self.jys.last - self.last_trade_price) / self.last_trade_price)*100
-            if vol >= prama:
-                self.do_juncang()
+            if vol >= prama and self.do_juncang():
                 self.last_trade_price = self.jys.last
 
 def test_connect_exchange(apiKey, secret, ding_token, ding_secret):

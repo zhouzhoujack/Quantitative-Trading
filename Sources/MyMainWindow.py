@@ -199,8 +199,6 @@ class MainWindow(QMainWindow):
         self.timer_.setInterval(self.all_params_info['run_interval']*1000)
         self.timer_.start()
 
-
-
         # 开始计算策略的执行时间，显示在状态栏
         self.run_time_thread.start()
 
