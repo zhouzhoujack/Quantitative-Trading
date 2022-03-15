@@ -146,9 +146,6 @@ class avg_position_class():
         self.money = self.jys.USDT_balance
         now_price = self.jys.last
 
-        # msg = "{} {} {} ".format(self.B, self.money, now_price)
-        # self.robot.ding_message(msg)
-
         self.total_money = self.B * now_price + self.money
         self.half_money = self.total_money / 2
         self.need_buy = (self.half_money - self.B * now_price) / now_price

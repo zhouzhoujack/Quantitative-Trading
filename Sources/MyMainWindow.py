@@ -284,6 +284,26 @@ class MainWindow(QMainWindow):
         ui.lastLineEdit.setText(str(status_info['last'])+'('+str(round(amplitude, 4))+'%)')
         ui.lastTradingPriceLineEdit.setText(str(round(status_info['last_trade_price'], 2)))
 
+        # 计算下次上涨或下跌的触发交易价格
+        nextUpTradingPrice = 0.0
+        nextDownTradingPrice = 0.0
+        if status_info['last_trade_price'] != 0:
+            next_price = status_info['last_trade_price']*(1+self.all_params_info['volatility']*0.01)
+            half_money = (status_info['eth'] * next_price + status_info['usdt']) / 2
+            trading_amount = (status_info['eth'] * next_price - half_money ) / next_price
+            _next_price = status_info['usdt']/(status_info['eth']-self.all_params_info['min_amount']*2)
+
+            nextUpTradingPrice = max(next_price, _next_price)
+
+            next_price = status_info['last_trade_price']*(1-self.all_params_info['volatility']*0.01)
+            half_money = (status_info['eth'] * next_price + status_info['usdt']) / 2
+            trading_amount = (half_money - status_info['eth'] * next_price) / next_price
+            _next_price = status_info['usdt'] / (status_info['eth'] + self.all_params_info['min_amount'] * 2)
+
+            nextDownTradingPrice = min(next_price, _next_price)
+
+        ui.nextTradingPriceLineEdit.setText(str(round(nextUpTradingPrice, 2)) + '(Up) | ' + str(round(nextDownTradingPrice, 2)) + '(Down)')
+
     def closeEvent(self, event):
         if(self.run_time_thread.isRunning()):
             self.run_time_thread.stopThread()
