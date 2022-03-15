@@ -184,6 +184,7 @@ class Ui_MainWindow(object):
         self.label_16.setObjectName("label_16")
         self.formLayout_4.setWidget(6, QtWidgets.QFormLayout.LabelRole, self.label_16)
         self.nextTradingPriceLineEdit = QtWidgets.QLineEdit(self.formLayoutWidget_4)
+        self.nextTradingPriceLineEdit.setReadOnly(True)
         self.nextTradingPriceLineEdit.setObjectName("nextTradingPriceLineEdit")
         self.formLayout_4.setWidget(6, QtWidgets.QFormLayout.FieldRole, self.nextTradingPriceLineEdit)
         self.stopPushButton = QtWidgets.QPushButton(self.groupBox)
